@@ -1,0 +1,46 @@
+Sqoop
+Sqoop version
+mysql -u root -p
+password :cloudera
+
+Import/Export with rdbms
+
+$ sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db
+ --username root -P --table departments --target-dir /todayresultwed -m 1
+
+or
+
+sqoop import --connect jdbc:mysql://localhost:3306/retail_db 
+--username root -P --table departments --target-dir /todayresultwed -m 1
+m-->Mapper by default the mapper job is 4 to change it to 1
+
+To display Data on command prompt
+$ hadoop fs -ls /todayresultwed
+$ hadoop fs -cat /todayresultwed/part*
+
+
+Export HDFS to MYSQL
+
+mysql> create table departments1 like departments;
+Query OK, 0 rows affected (0.17 sec)
+
+mysql> select * from departments1;
+Empty set (0.00 sec)
+
+
+clear the screen in mysql ctrl+L
+
+
+$sqoop export --connect jdbc:mysql://localhost:3306/retail_db --username 
+root -P --table departments1 --export-dir /todayresultwed1/part-m-00000 -m 1;
+
+or
+
+$sqoop export --connect jdbc:mysql://quickstart.cloudera:3306/retail_db
+--username root -P --table departments1 --export-dir /todayresultwed -m 1;
+
+
+
+
+
+	

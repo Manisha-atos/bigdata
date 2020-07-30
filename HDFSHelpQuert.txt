@@ -1,0 +1,254 @@
+changes setting for drag and drop from windows to linux
+https://www.guru99.com/bigdata-tutorials.html
+$--user terminal
+#--admin terminal
+sudo jps--successfull installation of coludera pakges. java virtual machin process status tool
+
+su--to change prompt  to admin terminal
+exit--to exit from admin terminal
+pwd-to check the current working directory
+
+hdfs command
+
+3 types of file system
+
+local file sys:data on local mc
+
+distributed file sys: data on remote mc
+
+HDFS : data inside the cluster
+
+
+hadoop version-to get the version details
+hadoop fs--list all hdfs command
+ifconfig--ip address  
+hadoop fs –help <command>--to get help about a command.
+	hadoop fs –help cat
+	Hadoop fs –help put
+https://www.edureka.co/blog/hdfs-commands-hadoop-shell-command
+hadoop fs  -mkdir /Banking--to create a directory
+if error occurs as  name is in safe mode 
+Use hdfs command instead of hadoop command for newer distributions. The hadoop command is being deprecated:
+hdfs dfsadmin -safemode leave
+
+hadoop fs  -mkdir /dir1 /dir2 /dir3--create multiple directories in hdfs
+ to create new directory in dir3 command is 
+hadoop fs  -mkdir /dir1 /dir2 /dir3 /dir4
+
+
+
+hadoop fs -mkdir -p /dir4/cards (sybdirectiories in parent directory)
+
+create a file emp.txt
+use put command to copy file form LFS to HDFS
+hadoop fs -put /home/cloudera/Desktop/emp.txt /cards
+
+command to copy from HDFS to local 
+
+
+tomorrow we will meet at 4 PM
+
+let me finish with rest commands
+
+after that every one will start with the assignment till 5 PM
+
+
+
+
+to display data
+hadoop fs -cat /dir1/emp.txt
+hadoop fs -cat /home/cloudera/Desktop/emp.txt --getting error
+
+
+we can browse the files and directories in brower
+select namenode->utilities 
+browse the directories 
+d-directory
+_-file
+single node/multinode
+block size 128 MB
+RF-1
+
+to explore the dirctory
+hadoop fs -ls dir1
+hadoop fs -touchz /dir1.stu.txt--will create new file with size as 0
+hadoop fs -ls dir1
+hadoop fs -cat /dir1/emp.txt--display the content
+hadoop fs -text /dir1/emp.txt--display the content
+
+To check the type
+test
+
+Usage: hdfs dfs -test -[ezd] URI
+
+Options:
+•The -e option will check to see if the file exists, returning 0 if true.
+•The -z option will check to see if the file is zero length, returning 0 if true.
+•The -d option will check to see if the path is directory, returning 0 if true.
+
+-f--file
+-z--empty file
+-d--directory
+	hadoop fs -touchz /dir1.stu.txt
+	hadoop fs -test -z /dir1.stu.txt
+	$ echo $?
+	output -0 (true) 1(flase) if it is a file with size 0
+
+	hadoop fs -test -d /dir1
+	$ echo $?(0)
+	
+	
+	hadoop fs -test -d /dir1/stu.txt
+	$ echo $?(0)
+
+
+	hadoop fs -test -f /dir1/stu.txt
+	$ echo $?
+
+command to copy from HDFS to local 
+hadoop fs -copyToLocal /dir1/emp.txt /home/cloudera/Desktop/payments
+
+get
+HDFS Command to copy files from hdfs to the local file system.
+hadoop fs –get /dir1/emp.txt /home/cloudera/Desktop/payments
+
+
+du
+HDFS Command to check the file size. 
+hadoop fs –du –s /dir1/emp.txt
+40 40 /d1/d2/d3/student.txt
+1-->size of file
+2-->total disk space use includding the replica 
+
+
+count
+HDFS Command to count the number of directories, 
+files, 
+and bytes under the paths that match the specified file pattern.
+
+hdfs dfs -count <path>
+hadoop fs -count /dir1
+
+
+rm
+HDFS Command to remove the file from HDFS.
+hadoop fs -rm /dir1/emp.txt
+
+
+rm -r
+HDFS Command to remove the entire directory and all of its content
+ from HDFS.
+hadoop fs -rm -r /dir1
+
+rmdir --to remove the directory
+
+hadoop fs -rmdir /dir1(if files r present then gives an error)
+
+cp
+
+
+HDFS Command to copy files from source to destination. This command allows multiple sources as well, in which case the destination must be a directory.
+
+Usage: hdfs dfs -cp <src> <dest>
+
+Command: hdfs dfs -cp /user/hadoop/file1 /user/hadoop/file2
+Command: hdfs dfs -cp /user/hadoop/file1 /user/hadoop/file2 /user/hadoop/dir  
+
+
+
+
+setrep
+setrep
+
+Usage: hdfs dfs -setrep [-R] [-w] <numReplicas> <path> 
+
+Changes the replication factor of a file. If path is a directory then the command recursively changes the replication factor of all files under the directory tree rooted at path.
+
+Options:
+•The -w flag requests that the command wait for the replication to complete.
+ This can potentially take a very long time.
+•The -R flag is accepted for backwards compatibility. It has no effect.
+
+Example:
+•hdfs dfs -setrep -w 3 /user/hadoop/dir1
+
+Exit Code:
+
+Returns 0 on success and -1 on error.
+
+chmod
+
+Usage: hdfs dfs -chmod [-R] <MODE[,MODE]... | OCTALMODE> URI [URI ...]
+
+Change the permissions of files. With -R, make the change recursively through the directory structure. The user must be the owner of the file, or else a super-user. Additional information is in the Permissions Guide.
+
+Options
+•The -R option will make the change recursively through the directory structure.
+
+moveFromLocal
+tail
+
+stat
+
+Usage: hdfs dfs -stat URI [URI ...]
+
+Returns the stat information on the path.
+
+Example:
+•hdfs dfs -stat path
+
+Exit Code: Returns 0 on success and -1 on error.
+
+
+tail
+
+Usage: hdfs dfs -tail [-f] URI
+
+Displays last kilobyte of the file to stdout.
+
+Options:
+•The -f option will output appended data as the file grows, as in Unix.
+
+Example:
+•hdfs dfs -tail pathname
+
+Exit Code: Returns 0 on success and -1 on error.
+
+getmerge
+wc
+
+hadoop fs -cat |wc
+hadoop fs -cat |wc l
+hadoop fs -cat |wc w
+hadoop fs -cat |wc c
+
+
+
+
+pls chk the repository 
+
+https://github.com/Manisha-atos/BigDataAssignment
+
+
+appendToFile
+
+Usage: hdfs dfs -appendToFile <localsrc> ... <dst> 
+
+Append single src, or multiple srcs from local file system to the destination file system. Also reads input from stdin and appends to destination file system.
+•hdfs dfs -appendToFile localfile /user/hadoop/hadoopfile
+•hdfs dfs -appendToFile localfile1 localfile2 /user/hadoop/hadoopfile
+•hdfs dfs -appendToFile localfile hdfs://nn.example.com/hadoop/hadoopfile
+•hdfs dfs -appendToFile - hdfs://nn.example.com/hadoop/hadoopfile Reads the input from stdin.
+
+Exit Code:
+
+Returns 0 on success and 1 on error.
+
+getmerge
+
+Usage: hdfs dfs -getmerge <src> <localdst> [addnl]
+
+Takes a source directory and a destination file as input and concatenates files in src into the destination local file. Optionally addnl can be set to enable adding a newline character at the end of each file.
+
+
+https://hadoop.apache.org/docs/current/hadoop-project-dist/hadoop-common/FileSystemShell.html

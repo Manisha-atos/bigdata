@@ -1,0 +1,782 @@
+Pig
+In a MapReduce framework, programs need to be translated into a series of Map and Reduce stages. However, this is not a programming model which data analysts are familiar with. So, in order to bridge this gap, an abstraction called Pig was built on top of Hadoop. 
+https://www.guru99.com/introduction-to-pig-and-hive.html
+Pig latin scripting -->Java 
+built support such as filtering, sorting, ordering
+UDF
+not complex as compare to java
+less code as SQL 
+
+IN_MEMORY option doesn't change when table content is
+transferred into RAM. Whether set to true or false, the blocks of
+data are only loaded into memory after a normal retrieval operation.
+When IN_MEMORY is set to true, HBase just tries to keep data in memory
+more aggressively than it normally would. This wiki explains it in
+more detail:
+
+
+http://jimbojw.com/wiki/index.php?title=Understanding_HBase_column-family_performance_options
+
+pig script-->logical plan-->physicalplav-->Map reduce -->Hadoop 
+
+pigcsript-->parser (syntax)-->DAC (logical representation)-->optimizer -->complier-->map reduce-->execuction engine(Hadoop)-->o/p
+
+Pig is 2 modes
+
+local-->data from LFS
+Mapreduce-->data FROm HDFS
+
+Execution in 3 ways
+1.interactive mode(grunt) 
+2.Batch Mode(pig script)
+3.embedded(UDF)
+
+
+pig –x local
+pig –x mapreduce
+
+
+1.Local mode: In this mode, Pig runs in a single JVM and makes use of local file system. This mode is suitable only for analysis of small datasets using Pig
+
+
+2.Map Reduce mode: In this mode, queries written in Pig Latin are translated into MapReduce jobs and are run on a Hadoop cluster (cluster may be pseudo or fully distributed). MapReduce mode with the fully distributed cluster is useful of running Pig on large datasets.
+
+
+Now, you can execute the script in the above file as shown below.
+
+Local mode:$ pig -x local Sample_script.pig
+
+MapReduce mode: $ pig -x mapreduce Sample_script.pig 
+
+clear
+help
+history
+
+ Data Types:
+basic /primitive--int,float,double,boolean,charray,butearray
+complex :tuple (,,,),bag{(),(),()}, map[key#value,key#value,key#value]
+atom (literal)
+Loading and Storing 
+LOAD To Load the data from the file system (local/HDFS) into a relation. 
+
+STORE To save a relation to the file system (local/HDFS). 
+DUMP
+
+s1 = LOAD 'file path ' USING PigStorage (',')
+s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage (',');
+dump s1;
+describe s1->Unknow scheme
+explain s1-->logical ,physicla,Map reduce 
+
+The describe operator is used to view the schema of a relation
+The explain operator is used to display the logical, physical, and MapReduce execution plans of a relation.
+
+The illustrate operator gives you the step-by-step execution of a sequence of statements.
+tuple->(,,)
+bag->{(),(),()}
+Map->[key#value,key#value]
+-----------------------------LFS--------------------------
+ s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+STORE s1 INTO '/home/cloudera/Desktop/demo/o1 ' USING PigStorage(',');
+STORE s2 INTO '/d1/o1 ' USING PigStorage(',');
+
+
+
+
+--------------------------------HDFS----------------------------
+ s1 = LOAD '/d1/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+-------------------------------------------------------
+ Pig Latin provides four different types of diagnostic operators -
+Dump operator
+Describe operator
+Explanation operator
+Illustration operator
+--------------------------Group By --------------------------------------
+ s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+grp_data = GROUP s1  by age;
+dump grp_data;
+
+grp_data = GROUP s1  by (age,city);
+
+group_all = GROUP s1 All;
+
+---------------------------co group-------------------------------------------------:
+
+
+c1 = LOAD '/home/cloudera/Desktop/demo/customer.txt' USING PigStorage(',' ) as (id:int,fname:chararray,age:int,city:chararray,sal:float);[cloudera@quicks
+cogroup_data = COGROUP s1 by age, c1 by age
+exec Command
+
+s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+group_data =COGROUP s1 by age, c1 by age;
+
+---------Joins----------------------------
+self join
+
+inner join
+
+outer join
+
+customers.txt
+==================================
+1,Raj,32,Ahmedabad,2000.00
+2,Keerthana,25,Delhi,1500.00
+3,karthi,23,Kota,2000.00
+4,Shyam,25,Mumbai,6500.00 
+5,Hari,27,Bhopal,8500.00
+6,Kannan,22,MP,4500.00
+7,Mukil,24,Indore,10000.00
+
+orders.txt
+==================================
+102,2017-01-08 00:00:00,3,3000
+100,2017-01-08 00:00:00,3,1500
+101,2017-02-20 00:00:00,2,1560
+103,2016-05-20 00:00:00,4,2060
+
+
+customers = LOAD '/home/cloudera/Desktop/demo/customer.txt' USING PigStorage(',')
+   as (id:int, name:chararray, age:int, address:chararray, salary:int);
+  
+orders = LOAD '/home/cloudera/Desktop/demo/order.txt' USING PigStorage(',')
+   as (oid:int, date:chararray, customer_id:int, amount:int)
+
+
+
+Self-join
+==================================
+c1 = LOAD '/home/cloudera/Desktop/demo/customer.txt' USING PigStorage(',')
+   as (id:int, name:chararray, age:int, address:chararray, salary:int);
+  
+grunt>c2= LOAD '/home/cloudera/Desktop/demo/customer.txt' USING PigStorage(',')
+   as (id:int, name:chararray, age:int, address:chararray, salary:int); 
+
+
+c3 = JOIN c1 BY id, c2 BY id;
+
+
+Inner-join
+==================================
+coustomer_orders = JOIN customers BY id, orders BY customer_id;
+
+Left Outer-join
+==================================
+outer_left = JOIN customers BY id LEFT OUTER, orders BY customer_id;
+
+Right Outer-join
+==================================
+outer_right = JOIN customers BY id RIGHT, orders BY customer_id;
+
+Full Outer-join
+==================================
+outer_full = JOIN customers BY id FULL OUTER, orders BY customer_id;
+
+
+Using the exec command, we can execute Pig scripts from the Grunt shell.
+
+Syntax
+
+Given below is the syntax of the utility command exec.
+grunt> exec [–param param_name = param_value] [–param_file file_name] [script]
+
+---------------------------------Set oprators---------------------
+
+Example
+ s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,dno:int,mgr:int,sal:chararray,city:chararray);
+
+e1 = LOAD '/home/cloudera/Desktop/Demo/emp.txt' USING PigStorage(',' ) as (id:int,fname:chararray,dno:int,mgr:int,sal:chararray,city:chararray)
+
+e2 = LOAD '/home/cloudera/Desktop/Demo/emp1.txt' USING PigStorage(',' ) as (eid:int,name:chararray,dno:int,mgr:int,sal:chararray,city:chararray)
+
+
+ s2 = LOAD '/home/cloudera/Desktop/demo/student1.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+union_data= UNION s1, s2;
+
+---------Split------------------------------------------
+s1 = LOAD '/d2/emp.txt' USING PigStorage(',' ) as (id:int,fname:chararray,age:int,city:chararray);
+
+SPLIT s1 into emp11 if age<23, emp2 if ( age>=23);
+dump student_details1;
+dump student_details2;
+
+------------------------Filter-------------------------
+ s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+city_filter = FILTER s1 BY city == 'PUNE'
+dump city_filter-->data fpr customers with city is PUNE;
+
+city_filter = FILTER s1 BY city == 'Pune' or age == 23;
+
+----------------distinct -----------------------
+ s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+distinct_data = DISTINCT s1;
+dump distinct_data;
+--------------------ForEach------------------------
+ s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+foreach_data = FOREACH s1 GENERATE id,age,city;
+
+--------------------order by---------------
+ s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+order_by_data = ORDER s1 BY age DESC;
+order_by_data = ORDER s1 BY city;
+
+====================limit=======================
+s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+limit_data = LIMIT s1 4; 
+
+dump limit_data;
+----------------------------------Eval Function-------------
+avg,min,max,count
+=================
+s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+student_group_all = Group s1 by city;
+
+Dump student_group_all;
+
+select deptno,max(sal)
+group by deptno;
+
+Pune({}{}--max,min, avg)
+
+
+
+
+
+s1_avg = foreach student_group_all Generate (s1.fname, s1.age), AVG(s1.age);
+
+dump s1_avg;
+
+s1_max = foreach student_group_all Generate (s1.fname, s1.age), MAX(s1.age),MIN(s1.age);
+
+dump s1_max;
+
+g1 = Group s1 all;
+s1_max = foreach g1 Generate ,MAX(s1.age),MIN(s1.age);
+
+s1_count = foreach g1 Generate COUNT(s1.age);
+
+select max(sal),min(sal) from emp
+gropp by deptno;
+
+10  1000
+20 6666
+
+Pune --max
+
+
+
+dump s1_count;
+Difference:
+===========
+Emp_sales.txt
+===============
+1,Robin,22,25000,sales
+2,BOB,23,30000,sales
+3,Maya,23,25000,sales
+4,Sara,25,40000,sales
+5,David,23,45000,sales
+6,Maggy,22,35000,sales
+
+Emp_bonus.txt
+=================
+1,Robin,22,25000,sales
+2,Jaya,23,20000,admin
+3,Maya,23,25000,sales
+4,Alia,25,50000,admin
+5,David,23,45000,sales
+6,Omar,30,30000,admin
+
+({}{})--cogroup
+
+
+
+emp_sales = LOAD '/home/cloudera/Desktop/Demo/employee_sales.txt' USING PigStorage(',')as (sno:int, name:chararray, age:int, salary:int, dept:chararray);
+
+emp_bonus = LOAD '/home/cloudera/Desktop/Demo/employee_bonus.txt' USING PigStorage(',')as (sno:int, name:chararray, age:int, salary:int,dept:chararray);
+
+cogroup_data = COGROUP emp_sales by sno, emp_bonus by sno;
+Dump cogroup_data;
+
+(1,{(1,Robin,22,25000,sales)},{(1,Robin,22,25000,sales)})
+(2,{(2,BOB,23,30000,sales)},{(2,Jaya,23,20000,admin)})
+(3,{(3,Maya,23,25000,sales)},{(3,Maya,23,25000,sales)})
+(4,{(4,Sara,25,40000,sales)},{(4,Alia,25,50000,admin)})
+(5,{(5,David,23,45000,sales)},{(5,David,23,45000,sales)})
+(6,{(6,Maggy,22,35000,sales)},{(6,Omar,30,30000,admin)})
+
+
+({})
+({(2,BOB,23,30000,sales),(2,Jaya,23,20000,admin)})
+({})
+({(4,Sara,25,40000,sales),(4,Alia,25,50000,admin)})
+({})
+({(6,Maggy,22,35000,sales),(6,Omar,30,30000,admin)})
+
+select * fr
+om emp where job=(select job from emp where empno=2100);
+
+
+subtract ---- 
+
+diff_data = FOREACH cogroup_data GENERATE DIFF(emp_sales,emp_bonus);
+
+dump diff_data;
+
+
+Subtract
+============
+cogroup_data = COGROUP emp_sales by sno, emp_bonus by sno;
+
+Dump cogroup_data;
+
+sub_data = FOREACH cogroup_data GENERATE SUBTRACT(emp_sales, emp_bonus);
+
+Dump sub_data;
+
+sub_data = FOREACH cogroup_data GENERATE SUBTRACT(emp_bonus, emp_sales);
+
+Dump sub_data;
+
+IsEmpty
+============
+cogroup_data = COGROUP emp_sales by sno, emp_bonus by age;
+
+Dump cogroup_data;
+
+(1,{(1,Robin,22,25000,sales)},{})
+(2,{(2,BOB,23,30000,sales)},{})
+(3,{(3,Maya,23,25000,sales)},{})
+(4,{(4,Sara,25,40000,sales)},{})
+(5,{(5,David,23,45000,sales)},{})
+(6,{(6,Maggy,22,35000,sales)},{})
+(22,{},{(1,Robin,22,25000,sales)})
+(23,{},{(5,David,23,45000,sales),(3,Maya,23,25000,sales),(2,Jaya,23,20000,admin)})
+(25,{},{(4,Alia,25,50000,admin)})
+(30,{},{(6,Omar,30,30000,admin)})
+
+
+(22,{},{(1,Robin,22,25000,sales)})
+(23,{},{(5,David,23,45000,sales),(3,Maya,23,25000,sales),(2,Jaya,23,20000,admin)})
+(25,{},{(4,Alia,25,50000,admin)})
+(30,{},{(6,Omar,30,30000,admin)})
+
+
+
+isempty_data = filter cogroup_data by IsEmpty(emp_sales);
+
+Dump isempty_data;
+============================Load and Store ==============================
+
+BinStorage 
+============================
+
+student_details = LOAD 'student_details.txt' USING PigStorage(',')as (id:int, firstname:chararray, age:int, city:chararray);
+
+STORE student_details INTO '/pig_Output/mydata' USING BinStorage();
+
+result = LOAD '/pig_Output/mydata/part-m-00000' USING BinStorage();
+
+=================================================String Functions=============
+upper_data = FOREACH s1 GENERATE (id,fname), UPPER(fname);
+
+=====================date functions=================================
+orders = LOAD '/home/cloudera/Desktop/demo/order.txt' USING PigStorage(',')
+   as (oid:int, date:chararray, customer_id:int, amount:int);
+
+todate_data = foreach orders GENERATE  ToDate(date,'yyyy/MM/dd HH:mm:ss')
+   as (date_time:DateTime);
+
+
+=========================Bag and Tuple functions==============
+
+TOBAG
+=======
+s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+dump s1;
+
+bag_data = FOREACH s1 GENERATE TOBAG (id,fname,age,city);
+
+dump bag_data;
+
+
+TOP
+=====
+s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+emp_group = Group s1 BY age;
+data_top = FOREACH emp_group { 
+   top = TOP(2, 1, s1); 
+   GENERATE top; 
+}
+
+TOTUPLE
+==========
+s1 = LOAD '/home/cloudera/Desktop/demo/student.txt' USING PigStorage(',' ) as (id:int,fname:chararray,lname:chararray,age:int,mobile:chararray,city:chararray);
+
+ totuple = FOREACH s1 GENERATE TOTUPLE (id,fname,age);
+
+dump totuple;
+=======================Script in Pig=======================
+
+Executing Pig Script in Batch mode
+
+While executing Apache Pig statements in batch mode, follow the steps given below.
+
+Step 1
+
+Write all the required Pig Latin statements in a single file. We can write all the Pig Latin statements and commands in a single file and save it as .pig file.
+
+Step 2
+
+Execute the Apache Pig script. You can execute the Pig script from the shell (Linux) as shown below.
+
+
+Local mode
+
+MapReduce mode
+
+$ pig -x local Sample_script.pig $ pig -x mapreduce Sample_script.pig 
+
+You can execute it from the Grunt shell as well using the exec command as shown below.
+grunt> exec /sample_script.pig
+
+
+
+
+
+
+
+http://pig.praveendeshmane.co.in/pig/pig-limit-example.jsp
+
+
+ilt_TECH_UPS_009-0007 
+
+cs-reply@amazon.in
+
+
+Let us assume there is a file named student.txt in the /pig_data/ directory of HDFS with the following content.
+
+Student.txt
+001,Rajiv,Hyderabad
+002,siddarth,Kolkata
+003,Rajesh,Delhi
+
+
+And, assume we have a script file named sample_script.pig in the /pig_data/ directory of HDFS with the following content.
+
+Sample_script.pig
+student = LOAD 'hdfs://localhost:9000/pig_data/student.txt' USING PigStorage(',') 
+   as (id:int,name:chararray,city:chararray);
+  
+Dump student;
+
+Now, let us execute the above script from the Grunt shell using the exec command as shown below.
+grunt> exec /sample_script.pig
+
+
+Output
+
+The exec command executes the script in the sample_script.pig. As directed in the script, it loads the student.txt file into Pig and gives you the result of the Dump operator displaying the following content.
+(1,Rajiv,Hyderabad)
+(2,siddarth,Kolkata)
+(3,Rajesh,Delhi) 
+
+
+kill Command
+
+You can kill a job from the Grunt shell using this command.
+
+Syntax
+
+Given below is the syntax of the kill command.
+grunt> kill JobId
+
+
+Example
+
+Suppose there is a running Pig job having id Id_0055, you can kill it from the Grunt shell using the kill command, as shown below.
+grunt> kill Id_0055
+
+
+run Command
+
+You can run a Pig script from the Grunt shell using the run command
+
+Syntax
+
+Given below is the syntax of the run command.
+grunt> run [–param param_name = param_value] [–param_file file_name] script
+
+
+Example
+
+Let us assume there is a file named student.txt in the /pig_data/ directory of HDFS with the following content.
+
+Student.txt
+001,Rajiv,Hyderabad
+002,siddarth,Kolkata
+003,Rajesh,Delhi
+
+
+And, assume we have a script file named sample_script.pig in the local filesystem with the following content.
+
+Sample_script.pig
+student = LOAD 'hdfs://localhost:9000/pig_data/student.txt' USING
+   PigStorage(',') as (id:int,name:chararray,city:chararray);
+
+Now, let us run the above script from the Grunt shell using the run command as shown below.
+grunt> run /sample_script.pig
+
+
+You can see the output of the script using the Dump operator as shown below.
+grunt> Dump;
+
+(1,Rajiv,Hyderabad)
+(2,siddarth,Kolkata)
+(3,Rajesh,Delhi)
+
+
+Note - The difference between exec and the run command is that if we use run, the statements from the script are available in the command history.
+
+
+
+
+
+
+
+
+
+
+
+Rt processing-->Spark
+Service Resource Management-->MapReduce/Yarn
+Batch processing->Hadoop
+
+
+
+
+PIG
+=================================================================================
+day 1:
+Life cycle :
+
+parse--optimizer--compiler-MapReduce--execu--Hadoop
+
+
+Grunt Shell execution engine:
+ 2 modes :
+You can run Apache Pig in two modes, namely, Local Mode and HDFS mode.
+
+Local Mode
+In this mode, all the files are installed and run from your local host and local file system.
+MapReduce Mode/hdfc mode(default mode)
+
+MapReduce mode is where we load or process the data that exists in the Hadoop File System (HDFS) using Apache Pig.
+
+Execution:
+interactive mode--grunt shell
+batch mode-.pig
+embedded-- function in Java can be embedded in Pig script.
+
+To start with grunt shell:
+>pig
+
+
+to start in hdfs mode:
+pig -x mapreduce
+
+
+Either of these commands gives you the Grunt shell prompt as shown below.
+
+grunt>
+You can exit the Grunt shell using ‘ctrl + d’.
+
+utility command
+clear
+history
+help
+exec /sample_script.pig
+
+product.txt
+
+
+prd = LOAD '/home/cloudera/Desktop/Demo/product.txt' USING PigStorage(',') as
+ (pid,pname,price);
+
+describe prd;
+
+dump prd;
+
+STORE prd INTO ' /d2/prd_output ' USING PigStorage (',');
+
+
+prd1 = LOAD '/d2/product.txt' USING PigStorage(',') as
+ (pid,pname,price);
+STORE prd1 INTO ' /d2/prd_output ' USING PigStorage (',');
+
+
+prd2 = LOAD '/d2/product.txt' USING PigStorage(',') as (pid:chararray,pname:chararray,price:double);
+dump prd2;
+
+
+
+Load-- Map Reduce (Java)
+
+Pig-scripting language --opeartor--MapReduce Job 
+
+-The Load Operator
+----------------
+You can load data into Apache Pig from the file system (HDFS/ Local) using LOAD operator of Pig Latin.
+ movies = LOAD '/home/cloudera/mar/pig1.txt' USING PigStorage(',') as (id:int,name:chararray,year:int,rating:int,duration:int);
+
+theater = LOAD '/home/cloudera/mar/pig2.txt' USING PigStorage(',') as (id:int,theater:chararray);
+
+
+Store the Data :
+--------------------
+STORE movies  INTO /home/coudera/Desktop/Demo/movie_output USING PigStorage(',');
+
+Diagnostic Operators. Pig Latin provides four different types of diagnostic operators -
+----------------------
+Dump operator:The Dump operator is used to run the Pig Latin statements and display the results on the screen. It is generally used for debugging Purpose
+dump prd--
+Describe operator-- str of data set 
+Explanation operator-- logicalplan,phy pla, mapreduce
+Illustration operator--record by record
+
+Day 2:
+
+Group by
+sdata= LOAD '/d1/student.txt' USING PigStorage(',') as (sid:int,fname:chararray,lname:chararray,age:int,mob:int,city:chararray);
+
+dump sdata;
+
+agedata=GROUP sdata by age;
+describe agedata
+
+(21,{{},{},{}}),
+(22,
+
+
+group_multiple = GROUP sdata by (age, city);
+dump group_multiple 
+
+order_grp = order group_multiple by age,city;
+
+
+
+group_all = GROUP sdata All;
+dump group_all;
+
+
+{}
+
+
+cogroup:
+
+001,Robin,22,newyork 
+002,BOB,23,Kolkata 
+003,Maya,23,Tokyo 
+004,Sara,25,London 
+005,David,23,Bhuwaneshwar 
+006,Maggy,22,Chennai
+
+sdata= LOAD '/d1/student.txt' USING PigStorage(',') as (sid:int,fname:chararray,lname:chararray,age:int,mob:int,city:chararray);
+
+edata = LOAD '/d2/emp.txt' USING PigStorage(',')
+   as (id:int, name:chararray, age:int, city:chararray);
+
+cogroup_data = COGROUP sdata by age, edata by age;
+
+
+
+
+
+
+
+joins:
+customers.txt
+
+1,Ramesh,32,Ahmedabad,2000.00
+2,Khilan,25,Delhi,1500.00
+3,kaushik,23,Kota,2000.00
+4,Chaitali,25,Mumbai,6500.00 
+5,Hardik,27,Bhopal,8500.00
+6,Komal,22,MP,4500.00
+7,Muffy,24,Indore,10000.00
+orders.txt
+
+102,2009-10-08 00:00:00,3,3000
+100,2009-10-08 00:00:00,3,1500
+101,2009-11-20 00:00:00,2,1560
+103,2008-05-20 00:00:00,4,2060
+And we have loaded these two files into Pig with the relations customers and orders as shown below.
+
+grunt> customers = LOAD '/d2/customers.txt' USING PigStorage(',')
+   as (id:int, name:chararray, age:int, address:chararray, salary:int);
+  
+grunt> orders = LOAD '/d2/orders.txt' USING PigStorage(',')
+   as (oid:int, date:chararray, customer_id:int, amount:int);
+Joins:
+
+Self Join:
+1,Raj,10,4,2000
+2,Keerthana,10,,2000
+3,karthi,20,1,2000
+4,Shyam,,4,2000
+5,Hari,30,1,2000
+6,Kannan,,4,2000
+7,Mukil,20,4,2000
+
+dept.txt
+10,Accounts,Mumbai
+20,Sales,Pune
+30,IT,Chennai
+40,Purchase,Pune
+
+
+emp1= LOAD '/d2/emp1.txt' USING PigStorage(',')
+   as (eid:int, name:chararray, deptno:int, mgr:int, salary:int)
+
+
+emp2= LOAD '/d2/emp1.txt' USING PigStorage(',')
+   as (eid:int, name:chararray, deptno:int, mgr:int, salary:int);
+
+
+
+emp3 = JOIN  emp1 BY eid, emp2 BY mgr;
+----------------------Inner-----------------
+dept1 = LOAD '/d2/dept.txt' USING PigStorage(',')
+   as (did:int, dname:chararray, loc:chararray)
+
+emp_dept=JOIN emp1 BY deptno,dept1 by did
+
+where emp.deptno=dept.did;
+
+---------Outer Join 
+
+emp_dept1=JOIN emp1 BY deptno LEFT OUTER,dept1 by did
+
+emp_dept2=JOIN emp1 BY deptno RIGHT OUTER,dept1 by did
+
+emp_dept3=JOIN emp1 BY deptno FULL OUTER,dept1 by did
+-------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+

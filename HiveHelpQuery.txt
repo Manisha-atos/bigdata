@@ -1,0 +1,267 @@
+Hive: It is a platform used to develop SQL type scripts to do MapReduce operations.
+
+Pig is only one tool which can process the unstr data.yahoo product
+Hive is a data warehouse infrastructure software that can create interaction between user and HDFS.
+It is a FAcebook product.
+It is used for quering purpose or to analyze large amount of str data.
+It is using HQL language.It is like SQL.
+ETL tool just to load the data.
+In Hive sub query ,update and delete are not possible
+
+Hbase client pig and hive.
+
+if u want to do update in hive then first we need to create a replica in hbase and perform update in hbase .
+hbase can perform CRUD operation
+convert jobs into MapReduce jobs
+operations
+load 
+
+/user/hive/warehouse
+
+if user wants connect with hbase using java we can go for jdbc odbc
+we r using the hue as an web interface to connect with hbase hue client
+or we can use a commandline interface to interac with hbase.hive cli 
+
+theft servre is a client side api used for executing all HQL Statements.
+
+Driver is a combination of compiler,executer & optimizer 
+
+responsible for all 3,plays a major role
+
+MetaStrore:storage unit either internale /external table are strored in metastror .default metastore  or  warehouse location is /user/hive/warehoues.
+
+Execution in Hive
+
+
+Hive :
+	Hive is a data warehouse infrastructure tool to process structured data in Hadoop.
+	It resides on top of Hadoop to summarize Big Data, and makes querying and analyzing easy.
+	Hive is a data warehouse infrastructure software that can create interaction between user and HDFS.
+	It is a FAcebook product.
+	It is used for quering purpose or to analyze large amount of str data.
+	It is using HQL language.It is like SQL.
+	ETL tool just to load the data.
+	In Hive sub query ,update and delete are not possible
+
+Queries:
+hive shell
+show databases
+create database banking;
+use banking
+to chekk the current db
+set hive.cli.print.current.db=true
+
+!clear --to clear the screen
+
+DROP DATABASE IF EXISTS userdb CASCADE;
+
+it Supports 2 type of tables
+Managed/internal table :default location is metastrore
+external table : need to specify the location with location keyword,if not specified then location will be 
+metastore.
+
+CREATE [TEMPORARY] [EXTERNAL] TABLE [IF NOT EXISTS] [db_name.] table_name
+[(col_name data_type [COMMENT col_comment], ...)]
+[COMMENT table_comment]
+[ROW FORMAT row_format]
+[STORED AS file_format]
+
+
+
+By default, the table's directory is in the /user/hive/warehouse directory. 
+You can configure this location with the hive.
+Managed Tables:
+Data can be loaded in 2 ways in Hive either from local file or from HDFS to Hive. 
+
+1.Create table & load data from LFS
+create table product (pid int,pname string,price double
+
+create table product (pid int,pname string,price double)
+row format delimited fields terminated by '\t';
+
+load data local inpath'/home/cloudera/Desktop/demo/product.txt' into table product
+
+select * from product
+
+truct or drop  a table , remove data --.txt
+desc table1 
+
+
+
+2.Create table & load data from HDFS
+hadoop fs -put /home/cloudera/Desktop/emp.txt /dir1/dir2
+
+create table product (pid int,pname string,price double)
+row format delimited field terminated by ',';
+
+create table product (pid int,pname string,price double)
+row format delimited field terminated by '\t';
+
+load data  inpath'/dir1/dir2/emp.txt' into table product
+select * from product
+insert into product values (1,'a',3000);
+
+1--management table with hdfs
+create table product (pid int,pname string,price double)
+row format delimited fields terminated by ','
+location '/d2';//defualt location /user/hive/warehouse
+
+load data inpath'/d1/product.txt' into table product
+
+/d1/product.txt
+
+hadoop fs -ls /d2
+product.txt
+
+drop table product
+
+data ---/d2/
+
+1--external table with hdfs
+
+create external table product (pid int,pname string,price double)
+row format delimited fields terminated by ','
+location '/d2';//defualt location /user/hive/warehouse
+
+load data inpath'/d1/product.txt' into table product
+
+/d1/product.txt
+
+hadoop fs -ls /d2
+product.txt
+
+drop table product
+
+data ---/d2/product.txt
+
+
+
+
+
+
+
+
+
+
+3.Create external table & load data from LFS
+create external table product (pid int,pname string,price double) 
+row format delimited field terminated by '\t' 
+location '/cards/pay';;//changing the hive location
+
+create external table employee(Name String, Sal Int) row format delimited fields terminated by ',';
+//def location of hive
+
+load data local inpath'/home/cloudera/Desktop/demo/product.txt' into product
+
+4.Create external table & load data from HDFS.
+create external table product (pid int,pname string,price double)
+row format delimited field terminated by '\t'
+location '/cards/pay';//changing the hive location
+
+create external table employee(Name String, Sal Int) 
+row format delimited fields terminated by ',';//def location of hive
+
+load data local inpath'/dir1/dir2/emp.txt' into product
+
+Tables in Hive
+
+
+
+
+
+When you drop an internal table, it drops the data, and it also drops the metadata.
+
+When you drop an external table, it only drops the meta data. That means hive is ignorant of that data now. 
+It does not touch the data itself
+Managed tables
+
+A managed table is stored under the hive.metastore.warehouse.dir path property,
+by default in a folder path similar to /user/hive/warehouse/databasename.db/tablename/. 
+The default location can be overridden by the location property during table creation. 
+If a managed table or partition is dropped, the data and metadata associated with that table or partition are deleted. If the PURGE option is not specified, the data is moved to a trash folder for a defined duration.
+
+Use managed tables when Hive should manage the lifecycle of the table, or when generating temporary tables.
+
+External tables
+
+
+
+An external table describes the metadata / schema on external files. External table files can be accessed and managed by processes outside of Hive. External tables can access data stored in sources such as Azure Storage Volumes (ASV) or remote HDFS locations. If the structure or partitioning of an external table is changed, an MSCK REPAIR TABLE table_name statement can be used to refresh metadata information.
+
+Use external tables when files are already present or in remote locations, and the files should remain even if the table is dropped.
+
+As mentioned above, Hive has two types of tables:
+
+•Managed table
+
+
+•External table
+
+
+For managed tables, Hive controls the lifecycle of their data. Hive stores the data for managed tables in a sub-directory under the directory defined by hive.metastore.warehouse.dir by default.
+
+When we drop a managed table, Hive deletes the data in the table.But managed tables are less convenient for sharing with other tools. For example, lets say we have data that is created and used primarily by Pig , but we want to run some queries against it, but not give Hive ownership of the data. 
+
+ 
+
+For External Tables ,Hive does not move the data into its warehouse directory. 
+If the external table is dropped, then the table metadata is deleted but not the data.
+
+For Internal tables , Hive moves data into its warehouse directory. 
+If the table is dropped, then the table metadata and the data will be deleted.
+
+
+
+
+
+To answer you Question :
+
+For External Tables ,Hive does not move the data into its warehouse directory. If the external table is dropped, then the table metadata is deleted but not the data.
+
+For Internal tables , Hive moves data into its warehouse directory. If the table is dropped, then the table metadata and the data will be deleted.
+
+
+
+
+
+To answer you Question :
+
+For External Tables ,Hive does not move the data into its warehouse directory. If the external table is dropped, then the table metadata is deleted but not the data.
+
+For Internal tables , Hive moves data into its warehouse directory. If the table is dropped, then the table metadata and the data will be deleted.
+
+Let us see about the above tables in detail
+
+Managed table
+
+Managed table is also called as Internal table. This is the default table in Hive. When we create a table in Hive without specifying it as external, by default we will get a Managed table.
+
+If we create a table as a managed table, the table will be created in a specific location in HDFS.
+
+By default, the table data will be created in /usr/hive/warehouse directory of HDFS.
+
+If we delete a Managed table, both the table data and meta data for that table will be deleted from the HDFS.
+
+Let us create a managed table with the below command.
+create table employee(Name String, Sal Int) row format delimited fields terminated by ',';
+https://acadgild.com/blog/managed-and-external-tables-in-hive
+
+!ctrl
+truncate manage table
+order by
+alter
+formatted schema
+command to execute script in hive
+joins
+complex data type
+comment in hive--
+metastore location
+exit;
+
+Hive --internal and external tables
+Hive -location default and user specified location
+create 
+alter 
+joins
+funtion  
+data type /complex data type array,stru,map

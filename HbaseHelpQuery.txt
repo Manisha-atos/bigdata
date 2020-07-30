@@ -1,0 +1,102 @@
+HBase
+Day1:
+HBase (NoSQL)-->HDFS
+Hbase -->Random 	Hadoop-->Batch processing linear /sequential access
+fater 
+
+Table 
+Row -->Column Families
+Col Fanilies-->Columns
+Clumns-->key , value pair
+
+Arch 
+vertically
+Mater Server
+Region Server
+Client 
+
+personal,professional,educational  are regions -->region server
+
+master server -->Manages schema, creation of tables and column families ,load balancing 
+
+hbase shell
+exit
+su
+PLEASE MUTE NORTELS
+
+
+list--to list all tables 
+status
+version
+table_help
+whoami
+help create 
+------------------------
+if any service is down 
+$su
+pwd cloudera
+#sudo service hbase-master restart
+#sudo service hbase-regionserver restart
+-------------------------------
+disable 'emp'
+list 
+drop 'emp'
+
+-------------------------------
+create ‘<table name>’,’<column family>’
+create 'emp','personal','professional'
+
+put 'emp' ,'1','personal:name','manisha'
+put 'emp' ,'1','personal:city','pune'
+put 'emp' ,'1','personal:age','52'
+put 'emp' ,'1','professional:cmp','Atos Syntel'
+put 'emp' ,'1','professional:sal','12456'
+
+put 'emp' ,'2','personal:fname','manisha'
+
+put 'emp' ,'2','location:city','pune'--error as unknown family
+
+create 'customer' ,'pdetails','prddetails'
+put 'customer','101','pdetails:cname','Manisha'
+put 'customer','101','pdetails:gender','Female'
+
+put 'customer' ,'101','prddetails:pname','Laptop'
+put 'customer','101','prddetails:brd','Dell'
+
+Day 2:
+
+create table emp ,'personal'
+alter 'emp' ,'personal',VERSIONS=>2;
+
+alter 'emp',NAME=>'professional',VERSIONS=>5
+alter 'emp','f1',{NAME=>'f2' ,IN_MEMORY=>'true'},{NAME=>f3,VERSIONS=>5}
+
+put 'emp' ,'1','personal:fname','Manisha'
+put 'emp' ,'1','personal:loc','Pune'
+put 'emp' ,'1','personal:age','11'
+
+scan 'emp' ,{column=>'personal',VERSION=>1}
+
+alter 'emp', READONLY
+
+alter 'empm','delete'=>'professional'
+
+
+hbase> alter 'emp;, NAME => 'professional', METHOD => 'delete'
+
+count 'emp'--> no of rows
+
+
+
+
+
+
+
+
+build an optimized request.
+HBase Tutorial: Where we can use HBase?
+•	We should use HBase where we have large data sets (millions or billions or rows and columns) and we require fast, random and real time, read and write access over the data.
+•	The data sets are distributed across various clusters and we need high scalability to handle data.
+•	The data is gathered from various data sources and it is either semi structured or unstructured data or a combination of all. It could be handled easily with HBase.
+
+HBase --
