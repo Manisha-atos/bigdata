@@ -4,21 +4,57 @@ mysql -u root -p
 password :cloudera
 
 Import/Export with rdbms
+Import data from RDBMS --HDFS
+
 
 $ sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db
- --username root -P --table departments --target-dir /todayresultwed -m 1
+ --username root -P --table departments --target-dir /d3/todayresultwed -m 1
 
 or
+\ is used when to new line
 
-sqoop import --connect jdbc:mysql://localhost:3306/retail_db 
---username root -P --table departments --target-dir /todayresultwed -m 1
+
+sqoop import --connect jdbc:mysql://localhost:3306/retail_db \
+--username root -P --table departments --target-dir /d2/todayresultwed -m 1
 m-->Mapper by default the mapper job is 4 to change it to 1
 
 To display Data on command prompt
+--------------------------------
 $ hadoop fs -ls /todayresultwed
 $ hadoop fs -cat /todayresultwed/part*
 
+Demo import with where clause
+------------------------------
+sqoop import --connect jdbc:mysql://localhost:3306/retail_db \
+--username root -P --table  student --target-dir /d2/wdata1 --where "age = 21" \
+-m 1  
 
+hadoop fs -cat /d2/wdata1/part-m-00000
+
+To Import all table in hdfs
+------------------------------
+$sqoop import-all-tables --connect jdbc:mysql://localhost/retail_db \
+--username root -P --warehouse-dir /d3/friday -m 1
+
+
+$sqoop import-all-tables --connect jdbc:mysql://localhost/retail_db --username root -P --warehouse-dir /resultwar1 --exclude-tables categories,orders,products,order_items,departments1,customers -m 1
+
+
+
+
+To do incremental Append
+---------------------------
+
+$sqoop eval --connect jdbc:mysql://localhost/retail_db --username root -P -e "insert into departments values  (12,'Accounts')"
+
+$sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/retail_db --username root -P --table \
+departments --target-dir /d2/todayresultwed --incremental append --check-column department_id --last-value \
+11 -m 1;
+
+//11 is the id after that all rows will get added 
+
+
+=======================================================================================
 Export HDFS to MYSQL
 
 mysql> create table departments1 like departments;
@@ -29,18 +65,112 @@ Empty set (0.00 sec)
 
 
 clear the screen in mysql ctrl+L
+export HDFS--RDBMS
 
-
-$sqoop export --connect jdbc:mysql://localhost:3306/retail_db --username 
-root -P --table departments1 --export-dir /todayresultwed1/part-m-00000 -m 1;
+$sqoop export --connect jdbc:mysql://localhost:3306/retail_db --username \
+root -P --table student --export-dir /d2/student.txt -m 1;
 
 or
 
-$sqoop export --connect jdbc:mysql://quickstart.cloudera:3306/retail_db
---username root -P --table departments1 --export-dir /todayresultwed -m 1;
+$sqoop export --connect jdbc:mysql://quickstart.cloudera:3306/retail_db \
+--username root -P --table student --export-dir /d2/student.txt -m 1;
+
+========================================================================================
+Import MySql to HBase
+
+$ sqoop import --connect jdbc:mysql://localhost/retail_db \
+--username root -P --table student --hbase-create-table \
+--column-family studentdesc \
+--hbase-table student --hbase-row-key sid -m 1
+
+$hbase shell
+$list
+$scan 'orderfinal'
+
+Export Hbase to RDBMS
+
+As a first step to export data to RDBMS, you have to create Hive external table on top of HBase table that you want to export. Also create permanent table similar to external table to hold data from external table.
+
+https://dwgeek.com/sqoop-export-hbase-table-into-relational-database.html/
+
+===================================================
+Export form Hive to MySql
+
+
+CREATE EXTERNAL TABLE ext_hbase_hive_personal (id INT, name STRING, city STRING, age INT) 
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler' 
+WITH SERDEPROPERTIES ("hbase.columns.mapping" = ":key, personal_data:name, personal_data:city, personal_data:age") 
+TBLPROPERTIES("hbase.table.name" = "personal");
+
+
+create table hb_exprt_test(id int, name string, city string, age int)
+row format delimited
+fields terminated by ','
+lines terminated by '\n'
+stored as textfile;
+
+insert into hb_exprt_test select * from ext_hbase_hive_personal;
+
+
+create table personal .......
+
+export hive--mysql
+sqoop export --connect jdbc:mysql://localhost/retail_db \
+  --username root \
+ - P \
+ --table personal \
+ --export-dir /user/hive/warehouse/hb_exprt_test \
+ --input-fields-terminated-by ',' \
+ --lines-terminated-by '\n'
+
+external table (hbase)--internal table --mysql
+
+
+
+
+Import from MySql to Hive
+===========================================================
+create database sqoop;
+use sqoop;
+
+create table customer(id varchar(3), name varchar(20), age varchar(3), salary integer(10));
+Query OK, 0 rows affected (0.09 sec)
+
+
+
+sqoop import --connect jdbc:mysql://localhost:3306/retail_db \
+--username root \
+-P \
+--split-by department_id \
+--columns department_id,department_name \
+--table departments \
+--target-dir /d2/friday \
+--fields-terminated-by "," \
+--hive-import \
+--create-hive-table \
+--hive-table test.dept1	
 
 
 
 
 
-	
+=================Sqoop Job =======================
+$ sqoop job --exec everydayimport
+$ sqoop job --list
+
+$ sqoop job --create everydayimport -- import \
+--connect jdbc:mysql://localhost/retail_db --username root \
+-P --table department --target-dir /todayresultthur \
+--incremental append --check-column department_id \
+--last-value 0 -m 1
+
+
+$sqoop job --delete everydayimport
+
+
+mysql--hdfs
+
+
+mysql-->hbase
+
+hbase-->hive --->mysql
