@@ -1,0 +1,92 @@
+Mysql—hive 
+sqoop import --connect jdbc:mysql://localhost:3306/retail_db \
+--username root \
+-P \
+--split-by department_id \
+--columns department_id,department_name \
+--table departments \
+--target-dir /d2/friday \
+--fields-terminated-by "," \
+--hive-import \
+--create-hive-table \
+--hive-table test.dept1	
+
+Time taken: 0.174 seconds, Fetched: 13 row(s)
+hive> select *from dept1;
+OK
+2	Fitness
+3	Footwear
+4	Apparel
+5	Golf
+6	Outdoors
+7	Fan Shop
+11	Finance
+12	Accounts
+Time taken: 0.292 seconds, Fetched: 8 row(s)
+hive>
+
+Job Creation
+
+sqoop job --create everydayimport -- import \
+--connect jdbc:mysql://localhost/retail_db --username root \
+-P --table departments --target-dir /d3/dept \
+--incremental append --check-column department_id \
+--last-value 0 -m 1
+
+Note: 0will append only the new entries 
+
+
+Warning: /usr/lib/sqoop/../accumulo does not exist! Accumulo imports will fail.
+Please set $ACCUMULO_HOME to the root of your Accumulo installation.
+20/07/31 04:44:47 INFO sqoop.Sqoop: Running Sqoop version: 1.4.6-cdh5.7.0
+Enter password: 
+[cloudera@quickstart ~]$ sqoop job --list
+Warning: /usr/lib/sqoop/../accumulo does not exist! Accumulo imports will fail.
+Please set $ACCUMULO_HOME to the root of your Accumulo installation.
+20/07/31 04:45:15 INFO sqoop.Sqoop: Running Sqoop version: 1.4.6-cdh5.7.0
+Available jobs:
+  everydayimport
+[cloudera@quickstart ~]$ sqoop job --exec everydayimport
+[cloudera@quickstart ~]$ hadoop fs -cat /d3/dept/part-m-00000
+2,Fitness
+3,Footwear
+4,Apparel
+5,Golf
+6,Outdoors
+7,Fan Shop
+11,Finance
+12,Accounts
+
+[cloudera@quickstart ~]$ sqoop eval --connect jdbc:mysql://localhost/retail_db --username root -P -e "insert into departments values  (13,'marketing')"
+Warning: /usr/lib/sqoop/../accumulo does not exist! Accumulo imports will fail.
+Please set $ACCUMULO_HOME to the root of your Accumulo installation.
+20/07/31 04:57:09 INFO sqoop.Sqoop: Running Sqoop version: 1.4.6-cdh5.7.0
+Enter password: 
+20/07/31 04:57:19 INFO manager.MySQLManager: Preparing to use a MySQL streaming resultset.
+20/07/31 04:57:21 INFO tool.EvalSqlTool: 1 row(s) updated.
+mysql> select * from departments;
++---------------+-----------------+
+| department_id | department_name |
++---------------+-----------------+
+|             2 | Fitness         |
+|             3 | Footwear        |
+|             4 | Apparel         |
+|             5 | Golf            |
+|             6 | Outdoors        |
+|             7 | Fan Shop        |
+|            11 | Finance         |
+|            12 | Accounts        |
+|            13 | marketing       |
++---------------+-----------------+
+9 rows in set (0.00 sec)
+
+mysql>
+[cloudera@quickstart ~]$ sqoop job --exec everydayimport
+Warning: /usr/lib/sqoop/../accumulo does not exist! Accumulo imports will fail.
+Please set $ACCUMULO_HOME to the root of your Accumulo installation.
+
+[cloudera@quickstart ~]$ hadoop fs -cat /d3/dept/part-m-00001
+13,marketing
+
+
+
