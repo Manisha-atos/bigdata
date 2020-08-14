@@ -1,0 +1,136 @@
+load data local inpath '/home/cloudera/Desktop/buck.txt'
+into table emp;
+select * from emp;
+insert overwrite table customer 
+select eid,ename,age,empsalary,dept from emp;
+
+!clear; or press ctrl + L
+
+describe extended customer;
+
+describe formatted emp;
+
+alter table customer add columns(city string);
+
+alter table customer change empsalary salary double;
+
+alter table customer replace columns(eid int,ename string,age int,
+salary double,dept string);
+
+keywords => press tab key
+
+set hive.cli.print.header=true;
+
+truncate table emp;
+
+truncate table customer;  [not possible to truncate external table]
+
+alter table customer rename to cust;
+select * from cust where dept='IT';
+select dept,count(*) from cust group by dept;
+
+How ro retrive the metadata about ???
+
+join internal external table???
+
+how we can access the dropped external table;
+
+partioning in hive ???
+
+why delete and update is not possible ?how to do?
+
+
+create table product(pid int,pname string,price float,category string)
+row format delimited fields terminated by '\t';
+load data local inpath '/home/cloudera/Desktop/products.txt'
+into table product;
+select * from product;
+
+
+to run hive script $hive -f /home/cloudera/Desktop/prodscript.sql
+
+input file
+
+1	Books	25.0	Stationery
+2	Pens	10.0	Stationery
+3	Sugar	40.05	House Hold Items
+4	Furniture	13000.0	Interiors
+
+
+
+select * from cust where dept='IT';
+select dept,count(*) from cust group by dept;
+
+
+Complex Data Type:
+
+==========================Array Demo============================================
+
+arrayinput.txt
+1,326362$3443$23432$875665$3443$43534$234$342
+2,123$323$546$546$5476
+3,435$345$678$122$98987
+4,234$7234$65242$6272
+create table array_test1 ( id int,all_nums array<int>) 
+row format delimited fields terminated by ','
+collection items terminated by '$';
+    
+load data local inpath '/home/cloudera/Desktop/arrayinput.txt' into
+table array_test1;
+
+-- 
+select id,all_nums[1] from array_test1;
+====Structure===================================================================
+
+Weather.txt
+1,32$65$moderate
+2,37$78$humid
+3,43$55$hotc
+4,23$45$cold
+
+
+create table struct_test ( id int,weather_reading 
+struct<temp:int,humidity:int,comment:string>)
+row format delimited fields terminated by ','
+collection items terminated by '$';
+
+load data local inpath '/home/cloudera/Desktop/weather.txt' into table
+struct_test;
+
+select id,weather_reading.temp from struct_test;
+==========================Map=====================================
+
+	
+
+
+create table map_test(id int,comments_map Map<int,
+string>)
+row format delimited fields terminated by ','
+collection items terminated by '#'
+map keys terminated by '@';
+
+load data local inpath '/home/cloudera/Desktop/data.txt'
+into table map_test3;
+
+select * from map_test3;
+
+select id,comments_map[1] from map_test3;
+query to itrate the collection column in hive
+
+
+-===========================================
+create table stud_demo(id int, name string, age int,  course string)   
+row format delimited  
+fields terminated by ',';  
+
+load data local inpath '/home/cloudera/Desktop/Demo/student.txt' into table stud_demo;
+
+create table student_part (id int, name string, age int)   
+partitioned by (course string)  
+row format delimited  
+fields terminated by ',';
+
+insert into student_part  
+partition(course)  
+select id, name, age,  course  
+from stud_demo;  

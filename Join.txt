@@ -1,0 +1,75 @@
+select * from emp1 e left outer join dept1 d on(e.deptid=d.deptid);
+
+select * from emp1 e sql dept1 d on(e.deptid=d.deptid);
+
+
+select * from emp1 e full outer join dept1 d on(e.deptid=d.deptid);
+
+
+create table emp1(empid int,ename string,deptno int,mgr int,sal double)
+row format delimited fields terminated by ',';
+
+
+create table dept1(deptid int,dname string)
+row format delimited fields terminated by ',';
+
+
+load data local inpath '/home/cloudera/Desktop/Dept.txt'
+into table dept1;
+
+
+load data local inpath '/home/cloudera/Desktop/Demo/emp.txt'
+into table emp1;
+
+
+select * from emp1;
+
+select * from dept1;
+
+select * from emp1 e join dept1 d on(e.deptid=d.dept.id);
+
+union 
+
+select * from emp
+union 
+select * from emp1;  full outer join 
+
+
+
+Emp.txt
+11,Rajan,32,25000,Mumbai
+14,Kunal,22,45000,Pune
+19,Vijay,45,70000,Chennai
+21,Himanshu,31,80000,Delhi
+
+Emp1.txt
+11,Rajan,32,25000,Mumbai
+14,Kunal,22,45000,Pune
+15,Manisha,22,3535,pune
+
+select * from emp
+union  
+select * from emp1;
+
+
+
+salgrade
+a 10000 20000
+b 20000 30000
+c 30001 40000
+d 40001 50000
+
+select e.name,e.sal,grade  form emp1,
+salgrade where sal between losal and hisal;
+
+select e.ename ,m.ename 
+from emp1 e join emp1 m
+on e.mgr=m.empid;
+
+
+
+Dept.txt
+11,Rajan,Admin
+22,Sanket,HR
+28,Manisha,HR
+21,Himanshu,Finance

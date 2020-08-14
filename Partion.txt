@@ -1,0 +1,84 @@
+Static partition
+
+Java
+5	sudhir	32	
+4	Diya	22	
+11	john	32	
+3	Jana	28	
+8	ajay	34	
+10	suresh	31	
+1	Ram	34	
+12	Chhaya	22	
+7	sanjay	22	
+6	raju	24	
+9	soman	21	
+2	Sriram	32	
+
+
+Hadoop
+15	sudhir	32	
+14	Diya	22	
+1	john	32	
+35	Jana	28	
+83	ajay	34	
+17	suresh	31	
+13	Ram	34	
+16	Chhaya	22	
+72	sanjay	22	
+66	raju	24	
+98	soman	21	
+20	Sriram	32	
+
+create table student (id int, name string, age int  )   
+partitioned by (course string)  
+row format delimited  
+fields terminated by '\t'
+location '/p1';
+
+
+
+
+load data local inpath '/home/codegyani/hive/student_details2' into table student  
+partition(course= "Java");  
+
+
+load data local inpath '/home/codegyani/hive/student_details2' into table student  
+partition(course= "hadoop");  
+
+Dynamic partion
+create table stud_demo(id int, name string, age int, course string)   
+row format delimited  
+fields terminated by '\t'
+location '/p1';
+
+
+load data local inpath '/home/cloudera/Desktop/Demo/student3.txt' into table stud_demo; 
+
+create table student_part (id int, name string, age int)   
+partitioned by (course string)  
+row format delimited  
+fields terminated by '\t';   
+
+ insert into student_part  
+partition(course)  
+select id, name, age,  course  
+from stud_demo;  
+
+select * from student_part where course="Java"
+
+ Bucketing:
+
+
+
+create table emp_demo (Id int, Name string , Salary float)    
+row format delimited    
+fields terminated by ',' ;  
+
+
+load data local inpath '/home/cloudera/Desktop/Demo/emp1.txt' into table emp_demo;  
+
+
+1 2 3 4 5 6 6 7y 7 8 8 9 9 9 9 9  09 9 9 9 9 9  9 9 
+
+1 2 3
+4 5 6

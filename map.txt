@@ -1,0 +1,13 @@
+
+
+
+
+
+
+
+
+
+
+
+select id,comments_map[1] from map_test3;
+query to itrate the collection column in hive

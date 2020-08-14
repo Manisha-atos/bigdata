@@ -1,0 +1,48 @@
+5	sudhir	32	10000.0	INS
+4	Diya	22	23000.0	BNFS
+11	john	32	30000.0	IT
+3	Jana	28	45000.0	HCLS
+8	ajay	34	50000.0	SE
+10	suresh	31	60000.0	ES
+1	Ram	34	63000.0	HR
+12	Chhaya	22	80000.0	HR
+7	sanjay	22	14000.0	SE
+6	raju	24	30000.0	MF
+9	soman	21	50000.0	IT
+2	Sriram	32	75000.0	IT
+
+
+hive> set mapred.reduce.tasks=2;internally set the 2 reduser but not be visible
+
+backend it is not exter db .hive itself is db
+
+
+hive> select * from cust order by empsalary;
+
+
+
+hive> set mapred.reduce.tasks=2;
+
+hive> select * from cust sort by empsalary;
+
+partioning,sorting is show n in advanve hive rtaining 
+
+
+Partitioning tabl
+
+
+Product 
+
+
+
+create table student (id int, name string, age int)   
+partitioned by (course string)  
+row format delimited  
+fields terminated by ','
+location /d2; 
+
+f1 --java f2--hadoop f3--devops 
+
+
+load data  inpath'/d1/student.txt' into table student  
+partition(course= "java");  
